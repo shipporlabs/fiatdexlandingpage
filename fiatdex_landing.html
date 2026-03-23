@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FiatDex — Buy  Tokens with Naira</title>
+<meta name="description" content="The first app that lets Nigerians buy any Injective token directly with Naira. No CEX. No confusion. Just tap and buy."/>
+<meta property="og:title" content="FiatDex — Buy Crypto with Naira, Instantly"/>
+<meta property="og:description" content="Skip the 5-step CEX nightmare. Pay with your bank. Get your tokens."/>
+<meta property="og:image" content="https://fiatdex.app/og.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#08091E;
+  --navy2:#0D0F28;
+  --indigo:#4F46E5;
+  --indigo2:#6C63FF;
+  --indigo-dim:#1a1940;
+  --gold:#F59E0B;
+  --gold2:#FCD34D;
+  --green:#10B981;
+  --red:#EF4444;
+  --text:#F0F1FF;
+  --text2:#9CA3C8;
+  --text3:#4B5280;
+  --border:#1E2350;
+  --card:#111437;
+  --card2:#161B45;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--navy);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:16px;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+
+/* ── NOISE TEXTURE ── */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:0;
+  opacity:0.4;
+}
+
+/* ── GRID BACKGROUND ── */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size:60px 60px;
+  opacity:0.18;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── GLOW ORBS ── */
+.orb{
+  position:fixed;
+  border-radius:50%;
+  filter:blur(120px);
+  pointer-events:none;
+  z-index:0;
+}
+.orb-1{width:600px;height:600px;background:rgba(79,70,229,0.12);top:-200px;right:-150px;}
+.orb-2{width:400px;height:400px;background:rgba(245,158,11,0.07);bottom:100px;left:-100px;}
+.orb-3{width:300px;height:300px;background:rgba(79,70,229,0.08);bottom:40%;right:10%;}
+
+/* ── NAV ── */
+nav{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:100;
+  padding:0 clamp(20px,5vw,80px);
+  height:68px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:rgba(8,9,30,0.8);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(79,70,229,0.12);
+}
+.nav-logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+}
+.nav-logo-mark{
+  width:36px;height:36px;
+  background:var(--indigo-dim);
+  border:1.5px solid rgba(79,70,229,0.5);
+  border-radius:10px;
+  display:grid;place-items:center;
+}
+.nav-logo-mark svg{width:20px;height:20px;}
+.nav-wordmark{
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:18px;
+  color:var(--text);
+  letter-spacing:-0.02em;
+}
+.nav-wordmark span{color:var(--indigo2);}
+nav a.nav-cta{
+  background:var(--indigo);
+  color:#fff;
+  text-decoration:none;
+  padding:8px 20px;
+  border-radius:10px;
+  font-size:14px;
+  font-weight:500;
+  transition:background 0.2s, transform 0.15s;
+}
+nav a.nav-cta:hover{background:var(--indigo2);transform:translateY(-1px);}
+
+/* ── HERO ── */
+.hero{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:120px clamp(20px,5vw,80px) 80px;
+}
+.hero-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(79,70,229,0.12);
+  border:1px solid rgba(79,70,229,0.3);
+  border-radius:100px;
+  padding:6px 16px 6px 8px;
+  font-size:13px;
+  color:var(--indigo2);
+  font-weight:500;
+  margin-bottom:32px;
+  animation:fadeUp 0.6s ease both;
+}
+.hero-badge-dot{
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px var(--green);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+.hero h1{
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:clamp(40px,7vw,88px);
+  line-height:1.0;
+  letter-spacing:-0.04em;
+  margin-bottom:24px;
+  animation:fadeUp 0.6s 0.1s ease both;
+}
+.hero h1 .line1{display:block;color:var(--text);}
+.hero h1 .line2{display:block;color:var(--text);}
+.hero h1 .line3{
+  display:block;
+  background:linear-gradient(135deg, var(--gold) 0%, var(--indigo2) 60%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.hero-sub{
+  font-size:clamp(17px,2vw,21px);
+  color:var(--text2);
+  max-width:560px;
+  line-height:1.6;
+  margin-bottom:48px;
+  font-weight:300;
+  animation:fadeUp 0.6s 0.2s ease both;
+}
+.hero-sub strong{color:var(--text);font-weight:500;}
+
+/* ── WAITLIST FORM ── */
+.waitlist-form{
+  width:100%;
+  max-width:480px;
+  animation:fadeUp 0.6s 0.3s ease both;
+}
+.input-row{
+  display:flex;
+  gap:8px;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:16px;
+  padding:6px 6px 6px 16px;
+  transition:border-color 0.2s;
+}
+.input-row:focus-within{border-color:rgba(79,70,229,0.6);}
+.input-row input{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  padding:8px 0;
+}
+.input-row input::placeholder{color:var(--text3);}
+.input-row button{
+  background:var(--indigo);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  padding:12px 24px;
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  font-weight:500;
+  cursor:pointer;
+  transition:background 0.2s, transform 0.15s;
+  white-space:nowrap;
+}
+.input-row button:hover{background:var(--indigo2);transform:scale(1.02);}
+.input-row button:active{transform:scale(0.98);}
+.input-row button.loading{opacity:0.7;pointer-events:none;}
+
+.waitlist-social-proof{
+  margin-top:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  font-size:13px;
+  color:var(--text3);
+}
+.avatar-stack{display:flex;}
+.avatar-stack span{
+  width:26px;height:26px;
+  border-radius:50%;
+  border:2px solid var(--navy);
+  margin-left:-8px;
+  display:grid;place-items:center;
+  font-size:11px;
+  font-weight:600;
+  color:#fff;
+}
+.avatar-stack span:first-child{margin-left:0;}
+.av1{background:#4F46E5;}
+.av2{background:#F59E0B;}
+.av3{background:#10B981;}
+.av4{background:#EF4444;}
+.av5{background:#8B5CF6;}
+
+/* ── SUCCESS STATE ── */
+.success-state{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  animation:fadeUp 0.4s ease both;
+}
+.success-state.show{display:flex;}
+.success-icon{
+  width:56px;height:56px;
+  background:rgba(16,185,129,0.12);
+  border:1.5px solid rgba(16,185,129,0.4);
+  border-radius:50%;
+  display:grid;place-items:center;
+  font-size:24px;
+}
+.success-state h3{
+  font-family:'Syne',sans-serif;
+  font-size:20px;
+  font-weight:700;
+  color:var(--text);
+}
+.success-state p{color:var(--text2);font-size:14px;text-align:center;}
+
+/* ── STATS BAR ── */
+.stats-bar{
+  position:relative;z-index:1;
+  display:flex;
+  justify-content:center;
+  gap:0;
+  flex-wrap:wrap;
+  padding:0 clamp(20px,5vw,80px) 80px;
+  animation:fadeUp 0.6s 0.4s ease both;
+}
+.stat{
+  padding:24px 40px;
+  border-right:1px solid var(--border);
+  text-align:center;
+}
+.stat:last-child{border-right:none;}
+.stat-num{
+  font-family:'Syne',sans-serif;
+  font-size:32px;
+  font-weight:800;
+  color:var(--text);
+  letter-spacing:-0.03em;
+}
+.stat-num .accent{color:var(--gold);}
+.stat-label{font-size:13px;color:var(--text3);margin-top:4px;}
+
+/* ── SECTION ── */
+section{
+  position:relative;z-index:1;
+  padding:80px clamp(20px,5vw,80px);
+  max-width:1200px;
+  margin:0 auto;
+}
+.section-label{
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:0.12em;
+  color:var(--indigo2);
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+.section-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(28px,4vw,44px);
+  font-weight:800;
+  letter-spacing:-0.03em;
+  line-height:1.1;
+  margin-bottom:16px;
+}
+.section-body{
+  font-size:17px;
+  color:var(--text2);
+  line-height:1.7;
+  font-weight:300;
+  max-width:540px;
+}
+
+/* ── PROBLEM SECTION ── */
+.problem-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+  margin-top:48px;
+}
+.problem-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:28px;
+  position:relative;
+  overflow:hidden;
+}
+.problem-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,var(--red),transparent);
+}
+.problem-card.solution::before{
+  background:linear-gradient(90deg,var(--indigo),var(--gold));
+}
+.problem-step-num{
+  font-family:'Syne',sans-serif;
+  font-size:48px;
+  font-weight:800;
+  color:var(--border);
+  line-height:1;
+  margin-bottom:16px;
+}
+.problem-card h3{
+  font-family:'Syne',sans-serif;
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:8px;
+  color:var(--text);
+}
+.problem-card p{font-size:14px;color:var(--text2);line-height:1.6;}
+.vs-divider{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  margin:32px 0;
+  color:var(--text3);
+  font-size:13px;
+  letter-spacing:0.06em;
+}
+.vs-divider::before,.vs-divider::after{
+  content:'';flex:1;
+  height:1px;background:var(--border);
+}
+
+/* ── HOW IT WORKS ── */
+.steps{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:2px;
+  margin-top:48px;
+  background:var(--border);
+  border-radius:20px;
+  overflow:hidden;
+}
+.step{
+  background:var(--card);
+  padding:36px 28px;
+  position:relative;
+}
+.step-icon{
+  width:48px;height:48px;
+  border-radius:14px;
+  display:grid;place-items:center;
+  margin-bottom:20px;
+  font-size:22px;
+}
+.step-icon.s1{background:rgba(79,70,229,0.15);border:1px solid rgba(79,70,229,0.3);}
+.step-icon.s2{background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);}
+.step-icon.s3{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);}
+.step-num{
+  position:absolute;top:24px;right:24px;
+  font-family:'Syne',sans-serif;
+  font-size:13px;font-weight:700;
+  color:var(--text3);
+}
+.step h3{
+  font-family:'Syne',sans-serif;
+  font-size:18px;font-weight:700;
+  margin-bottom:10px;
+  color:var(--text);
+}
+.step p{font-size:14px;color:var(--text2);line-height:1.6;}
+.step-time{
+  display:inline-block;
+  margin-top:16px;
+  font-size:12px;font-weight:600;
+  color:var(--gold);
+  background:rgba(245,158,11,0.1);
+  border-radius:100px;
+  padding:3px 10px;
+}
+
+/* ── FEATURE CARDS ── */
+.features{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+  margin-top:48px;
+}
+.feature-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:28px;
+  transition:border-color 0.25s, transform 0.25s;
+}
+.feature-card:hover{
+  border-color:rgba(79,70,229,0.4);
+  transform:translateY(-3px);
+}
+.feature-card.featured{
+  grid-column:span 2;
+  background:linear-gradient(135deg,var(--card) 0%,var(--indigo-dim) 100%);
+  border-color:rgba(79,70,229,0.3);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:40px;
+  align-items:center;
+}
+.feature-icon{
+  width:44px;height:44px;
+  border-radius:12px;
+  display:grid;place-items:center;
+  font-size:20px;
+  margin-bottom:16px;
+  background:rgba(79,70,229,0.12);
+  border:1px solid rgba(79,70,229,0.2);
+}
+.feature-card h3{
+  font-family:'Syne',sans-serif;
+  font-size:18px;font-weight:700;
+  margin-bottom:8px;
+  color:var(--text);
+}
+.feature-card p{font-size:14px;color:var(--text2);line-height:1.6;}
+
+/* ── MOCK APP CARD ── */
+.mock-app{
+  background:var(--card2);
+  border:1.5px solid var(--border);
+  border-radius:28px;
+  padding:24px;
+  font-size:13px;
+}
+.mock-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:20px;
+}
+.mock-header-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;}
+.mock-badge{
+  background:rgba(16,185,129,0.12);
+  border:1px solid rgba(16,185,129,0.3);
+  color:var(--green);
+  padding:4px 10px;border-radius:100px;font-size:11px;font-weight:600;
+}
+.mock-input-area{
+  background:var(--navy2);
+  border:1.5px solid var(--indigo);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:12px;
+}
+.mock-input-label{color:var(--text3);font-size:11px;margin-bottom:6px;}
+.mock-input-amount{
+  font-family:'Syne',sans-serif;
+  font-size:32px;font-weight:800;
+  color:var(--text);letter-spacing:-0.02em;
+}
+.mock-input-amount .currency{font-size:18px;color:var(--gold);}
+.mock-chips{display:flex;gap:6px;margin-bottom:16px;}
+.mock-chip{
+  padding:5px 12px;border-radius:8px;
+  background:rgba(79,70,229,0.1);
+  border:1px solid rgba(79,70,229,0.25);
+  color:var(--indigo2);font-size:12px;font-weight:600;cursor:pointer;
+}
+.mock-chip.active{background:var(--indigo);color:#fff;border-color:var(--indigo);}
+.mock-rate{
+  display:flex;justify-content:space-between;
+  color:var(--text3);font-size:12px;margin-bottom:16px;padding:0 2px;
+}
+.mock-rate span{color:var(--text2);}
+.mock-btn{
+  width:100%;
+  background:var(--indigo);
+  color:#fff;
+  border:none;border-radius:12px;
+  padding:14px;
+  font-family:'Syne',sans-serif;
+  font-size:15px;font-weight:700;
+  cursor:pointer;letter-spacing:-0.01em;
+}
+
+/* ── TOKEN TICKER ── */
+.ticker-wrap{
+  position:relative;z-index:1;
+  overflow:hidden;
+  padding:20px 0;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  margin:0 0 0 0;
+}
+.ticker-track{
+  display:flex;
+  gap:0;
+  animation:ticker 30s linear infinite;
+  width:max-content;
+}
+.ticker-item{
+  display:flex;align-items:center;gap:10px;
+  padding:0 32px;
+  border-right:1px solid var(--border);
+  white-space:nowrap;
+}
+.ticker-name{font-size:14px;font-weight:500;color:var(--text2);}
+.ticker-price{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);}
+.ticker-change{font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;}
+.pos{color:var(--green);background:rgba(16,185,129,0.1);}
+.neg{color:var(--red);background:rgba(239,68,68,0.1);}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── TESTIMONIAL / QUOTE ── */
+.quotes{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  margin-top:48px;
+}
+.quote-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:28px;
+  position:relative;
+}
+.quote-mark{
+  font-size:48px;
+  line-height:1;
+  color:var(--indigo-dim);
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  margin-bottom:16px;
+}
+.quote-text{font-size:15px;color:var(--text2);line-height:1.7;font-style:italic;}
+.quote-author{
+  display:flex;align-items:center;gap:10px;
+  margin-top:20px;padding-top:16px;
+  border-top:1px solid var(--border);
+}
+.quote-avatar{
+  width:36px;height:36px;border-radius:50%;
+  display:grid;place-items:center;
+  font-size:14px;font-weight:700;color:#fff;
+}
+.quote-name{font-size:14px;font-weight:500;color:var(--text);}
+.quote-role{font-size:12px;color:var(--text3);}
+
+/* ── CTA SECTION ── */
+.cta-section{
+  position:relative;z-index:1;
+  padding:80px clamp(20px,5vw,80px) 120px;
+  text-align:center;
+}
+.cta-card{
+  background:linear-gradient(135deg,var(--card) 0%,var(--indigo-dim) 100%);
+  border:1px solid rgba(79,70,229,0.3);
+  border-radius:28px;
+  padding:clamp(40px,6vw,80px) clamp(20px,5vw,80px);
+  max-width:700px;
+  margin:0 auto;
+  position:relative;
+  overflow:hidden;
+}
+.cta-card::before{
+  content:'';
+  position:absolute;
+  top:-60px;right:-60px;
+  width:240px;height:240px;
+  background:rgba(79,70,229,0.1);
+  border-radius:50%;
+  filter:blur(60px);
+}
+.cta-card h2{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(28px,4vw,44px);
+  font-weight:800;
+  letter-spacing:-0.03em;
+  margin-bottom:16px;
+}
+.cta-card p{
+  font-size:17px;color:var(--text2);
+  margin-bottom:40px;line-height:1.6;font-weight:300;
+}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);
+  padding:32px clamp(20px,5vw,80px);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:16px;
+}
+.footer-left{display:flex;align-items:center;gap:12px;}
+.footer-links{display:flex;gap:24px;}
+.footer-links a{
+  font-size:13px;color:var(--text3);
+  text-decoration:none;transition:color 0.2s;
+}
+.footer-links a:hover{color:var(--text2);}
+.footer-copy{font-size:12px;color:var(--text3);}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.reveal{
+  opacity:0;transform:translateY(24px);
+  transition:opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-delay-1{transition-delay:0.1s;}
+.reveal-delay-2{transition-delay:0.2s;}
+.reveal-delay-3{transition-delay:0.3s;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .problem-grid,.steps,.features,.quotes{grid-template-columns:1fr;}
+  .feature-card.featured{grid-column:span 1;grid-template-columns:1fr;}
+  .stat{padding:20px 24px;border-right:none;border-bottom:1px solid var(--border);}
+  .stat:last-child{border-bottom:none;}
+  .stats-bar{flex-direction:column;align-items:center;}
+  .input-row{flex-direction:column;padding:12px;}
+  .input-row button{width:100%;}
+  nav .nav-cta{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 3 A9 9 0 0 1 21 12" stroke="#4F46E5" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M12 3 A9 9 0 0 0 5 7" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+        <rect x="5" y="10" width="6" height="2.5" rx="1" fill="#4F46E5"/>
+        <rect x="5" y="14" width="4" height="2.5" rx="1" fill="#4F46E5" opacity=".6"/>
+        <polygon points="13,10 19,13 13,16" fill="#F59E0B"/>
+      </svg>
+    </div>
+    <span class="nav-wordmark">Fiat<span>Dex</span></span>
+  </a>
+  <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="hero-badge-dot"></span>
+    Now accepting waitlist signups · Nigeria 🇳🇬
+  </div>
+
+  <h1>
+    <span class="line1">Buy Crypto.</span>
+    <span class="line2">Pay Naira.</span>
+    <span class="line3">No Stress.</span>
+  </h1>
+
+  <p class="hero-sub">
+    FiatDex lets you buy any crypto token directly from your bank account.
+    <strong>No CEX account. No manual swaps. No confusion.</strong>
+    Just tap, pay, and receive.
+  </p>
+
+  <div class="waitlist-form" id="waitlist">
+    <div id="formWrap">
+      <div class="input-row">
+        <input type="email" id="emailInput" placeholder="Enter your email address" autocomplete="email"/>
+        <button id="joinBtn" onclick="joinWaitlist()">Join Waitlist →</button>
+      </div>
+      <div class="waitlist-social-proof">
+        <div class="avatar-stack">
+          <span class="av1">A</span>
+          <span class="av2">K</span>
+          <span class="av3">E</span>
+          <span class="av4">T</span>
+          <span class="av5">O</span>
+        </div>
+        <span>Join <strong style="color:var(--text2)">340+ Nigerians</strong> already on the waitlist</span>
+      </div>
+    </div>
+    <div class="success-state" id="successState">
+      <div class="success-icon">✓</div>
+      <h3>You're on the list!</h3>
+      <p>We'll email you the moment FiatDex goes live.<br/>Share with friends to move up the queue.</p>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <a href="https://twitter.com/intent/tweet?text=Just%20joined%20the%20FiatDex%20waitlist%20%E2%80%94%20the%20app%20that%20lets%20Nigerians%20buy%20Injective%20tokens%20directly%20with%20Naira.%20No%20CEX%20needed.%20%F0%9F%87%B3%F0%9F%87%AC%20fiatdex.app&hashtags=FiatDex,Web3Nigeria,Injective" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(29,161,242,0.12);border:1px solid rgba(29,161,242,0.3);color:#1DA1F2;padding:8px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:500;">
+          Share on X
+        </a>
+        <a href="https://wa.me/?text=Just%20joined%20FiatDex%20waitlist%20%E2%80%94%20buy%20crypto%20with%20Naira%20directly.%20No%20CEX%20needed!%20Join%20here%3A%20fiatdex.app" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.3);color:#25D366;padding:8px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:500;">
+          Share on WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <div class="ticker-item"><span class="ticker-name">INJ</span><span class="ticker-price">$24.50</span><span class="ticker-change pos">+8.4%</span></div>
+    <div class="ticker-item"><span class="ticker-name">DOJO</span><span class="ticker-price">$0.032</span><span class="ticker-change pos">+22.3%</span></div>
+    <div class="ticker-item"><span class="ticker-name">NINJA</span><span class="ticker-price">$0.0045</span><span class="ticker-change pos">+15.8%</span></div>
+    <div class="ticker-item"><span class="ticker-name">HLX</span><span class="ticker-price">$0.84</span><span class="ticker-change pos">+12.1%</span></div>
+    <div class="ticker-item"><span class="ticker-name">ASTRO</span><span class="ticker-price">$0.18</span><span class="ticker-change neg">-4.2%</span></div>
+    <div class="ticker-item"><span class="ticker-name">MITO</span><span class="ticker-price">$1.20</span><span class="ticker-change pos">+6.7%</span></div>
+    <div class="ticker-item"><span class="ticker-name">NEP</span><span class="ticker-price">$0.55</span><span class="ticker-change neg">-8.1%</span></div>
+    <div class="ticker-item"><span class="ticker-name">TALIS</span><span class="ticker-price">$0.78</span><span class="ticker-change neg">-5.3%</span></div>
+    <!-- duplicate for seamless loop -->
+    <div class="ticker-item"><span class="ticker-name">INJ</span><span class="ticker-price">$24.50</span><span class="ticker-change pos">+8.4%</span></div>
+    <div class="ticker-item"><span class="ticker-name">DOJO</span><span class="ticker-price">$0.032</span><span class="ticker-change pos">+22.3%</span></div>
+    <div class="ticker-item"><span class="ticker-name">NINJA</span><span class="ticker-price">$0.0045</span><span class="ticker-change pos">+15.8%</span></div>
+    <div class="ticker-item"><span class="ticker-name">HLX</span><span class="ticker-price">$0.84</span><span class="ticker-change pos">+12.1%</span></div>
+    <div class="ticker-item"><span class="ticker-name">ASTRO</span><span class="ticker-price">$0.18</span><span class="ticker-change neg">-4.2%</span></div>
+    <div class="ticker-item"><span class="ticker-name">MITO</span><span class="ticker-price">$1.20</span><span class="ticker-change pos">+6.7%</span></div>
+    <div class="ticker-item"><span class="ticker-name">NEP</span><span class="ticker-price">$0.55</span><span class="ticker-change neg">-8.1%</span></div>
+    <div class="ticker-item"><span class="ticker-name">TALIS</span><span class="ticker-price">$0.78</span><span class="ticker-change neg">-5.3%</span></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar reveal">
+  <div class="stat"><div class="stat-num"><span class="accent">₦50B+</span></div><div class="stat-label">Nigeria's annual crypto volume</div></div>
+  <div class="stat"><div class="stat-num">5 <span style="font-size:18px;color:var(--text3)">steps</span></div><div class="stat-label">To buy crypto today</div></div>
+  <div class="stat"><div class="stat-num"><span class="accent">1</span></div><div class="stat-label">Step with FiatDex</div></div>
+  <div class="stat"><div class="stat-num">90<span style="font-size:18px;color:var(--text3)">sec</span></div><div class="stat-label">Average time to receive tokens</div></div>
+</div>
+
+<!-- PROBLEM -->
+<section>
+  <p class="section-label reveal">The Problem</p>
+  <h2 class="section-title reveal">Buying crypto in Nigeria<br/>is unnecessarily painful.</h2>
+  <p class="section-body reveal">Every Nigerian crypto user goes through the same nightmare before they can buy a single DeFi token.</p>
+
+  <div class="problem-grid">
+    <div class="problem-card reveal">
+      <div class="problem-step-num">01</div>
+      <h3>Create a CEX account</h3>
+      <p>Upload your NIN, BVN, selfie. Wait 3 days for KYC. Hope it doesn't get rejected.</p>
+    </div>
+    <div class="problem-card reveal reveal-delay-1">
+      <div class="problem-step-num">02</div>
+      <h3>Deposit Naira</h3>
+      <p>Bank transfer that might take hours. Minimum amounts. Random fees. Transfer reversal anxiety.</p>
+    </div>
+    <div class="problem-card reveal reveal-delay-2">
+      <div class="problem-step-num">03</div>
+      <h3>Buy USDT or BTC</h3>
+      <p>Navigate confusing order books. Worry about price slippage. Pay the spread.</p>
+    </div>
+    <div class="problem-card reveal reveal-delay-3">
+      <div class="problem-step-num">04–05</div>
+      <h3>Set up a Web3 wallet + swap</h3>
+      <p>Write down a 24-word seed phrase. Find the right DEX. Execute the swap. Pray nothing goes wrong.</p>
+    </div>
+  </div>
+
+  <div class="vs-divider reveal">INSTEAD, WITH FIATDEX</div>
+
+  <div class="problem-card solution reveal">
+    <div class="problem-step-num" style="color:var(--indigo)">01</div>
+    <h3 style="color:var(--text)">Enter amount → Pay → Receive token.</h3>
+    <p>That's it. Card or bank transfer. Token lands in your wallet in under 90 seconds. No CEX account needed.</p>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section>
+  <p class="section-label reveal">How It Works</p>
+  <h2 class="section-title reveal">Three steps.<br/>Under 90 seconds.</h2>
+  <div class="steps reveal">
+    <div class="step">
+      <span class="step-num">01</span>
+      <div class="step-icon s1">📊</div>
+      <h3>Find your token</h3>
+      <p>Browse gainers, losers, or trending tokens on Injective. See live prices, volume, and 24h charts.</p>
+      <span class="step-time">~10 seconds</span>
+    </div>
+    <div class="step">
+      <span class="step-num">02</span>
+      <div class="step-icon s2">💳</div>
+      <h3>Pay with Naira</h3>
+      <p>Enter your amount in Naira. Pay with your debit card or bank transfer. No crypto knowledge needed.</p>
+      <span class="step-time">~40 seconds</span>
+    </div>
+    <div class="step">
+      <span class="step-num">03</span>
+      <div class="step-icon s3">✅</div>
+      <h3>Token arrives</h3>
+      <p>We automatically swap INJ for your chosen token. It lands directly in your connected wallet.</p>
+      <span class="step-time">~30 seconds</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section>
+  <p class="section-label reveal">Features</p>
+  <h2 class="section-title reveal">Everything you need.<br/>Nothing you don't.</h2>
+  <div class="features">
+    <div class="feature-card featured reveal">
+      <div>
+        <div class="feature-icon">⚡</div>
+        <h3>Fiat → Token in one tap</h3>
+        <p>The entire journey — from Naira to on-chain token — happens inside one app. No switching between platforms, no manual conversion steps, no wallet confusion. Pay in Naira, receive token.</p>
+      </div>
+      <div class="mock-app">
+        <div class="mock-header">
+          <span class="mock-header-title">Buy INJ</span>
+          <span class="mock-badge">● Live</span>
+        </div>
+        <div class="mock-input-area">
+          <div class="mock-input-label">You pay</div>
+          <div class="mock-input-amount"><span class="currency">₦</span> 10,000</div>
+        </div>
+        <div class="mock-chips">
+          <span class="mock-chip">₦1K</span>
+          <span class="mock-chip active">₦10K</span>
+          <span class="mock-chip">₦50K</span>
+          <span class="mock-chip">₦100K</span>
+        </div>
+        <div class="mock-rate">
+          <span>You receive</span>
+          <span>~12.4 INJ</span>
+        </div>
+        <div class="mock-rate">
+          <span>Exchange rate</span>
+          <span>1 INJ = ₦804.50</span>
+        </div>
+        <button class="mock-btn">Pay with Bank Transfer →</button>
+      </div>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">📈</div>
+      <h3>Real-time market data</h3>
+      <p>Live prices, 24h charts, volume, and market cap for every Injective token. Gainers, Losers, and Trending tabs updated every 10 seconds.</p>
+    </div>
+    <div class="feature-card reveal reveal-delay-1">
+      <div class="feature-icon">🔄</div>
+      <h3>Automatic swap execution</h3>
+      <p>After your fiat payment clears, we automatically execute the swap on Injective's on-chain order book. You don't touch a single DEX setting.</p>
+    </div>
+    <div class="feature-card reveal reveal-delay-2">
+      <div class="feature-icon">🛡️</div>
+      <h3>Non-custodial & secure</h3>
+      <p>We never hold your funds or private keys. Connect your Keplr or MetaMask wallet — tokens go straight there. You stay in control always.</p>
+    </div>
+    <div class="feature-card reveal reveal-delay-3">
+      <div class="feature-icon">💼</div>
+      <h3>Track your portfolio</h3>
+      <p>See all your Injective tokens in one place with real-time value, P&L tracking, and a one-tap Sell button when you're ready to exit.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section>
+  <p class="section-label reveal">Early Reactions</p>
+  <h2 class="section-title reveal">What beta testers are saying.</h2>
+  <div class="quotes">
+    <div class="quote-card reveal">
+      <div class="quote-mark">"</div>
+      <p class="quote-text">I've been trying to buy INJ for months but kept dropping off at the wallet setup stage. FiatDex made it feel like buying airtime.</p>
+      <div class="quote-author">
+        <div class="quote-avatar" style="background:#4F46E5">A</div>
+        <div><div class="quote-name">Adewale O.</div><div class="quote-role">Lagos, Nigeria</div></div>
+      </div>
+    </div>
+    <div class="quote-card reveal reveal-delay-1">
+      <div class="quote-mark">"</div>
+      <p class="quote-text">The fund with Naira and auto-swap feature is exactly what the Nigerian DeFi market has been missing. This is the onramp we needed.</p>
+      <div class="quote-author">
+        <div class="quote-avatar" style="background:#F59E0B;color:#000">K</div>
+        <div><div class="quote-name">Kemi A.</div><div class="quote-role">Abuja, Nigeria</div></div>
+      </div>
+    </div>
+    <div class="quote-card reveal reveal-delay-2">
+      <div class="quote-mark">"</div>
+      <p class="quote-text">Clean UI, fast execution. I bought DOJO in under a minute from my GTB account. Didn't even need to know what a seed phrase was.</p>
+      <div class="quote-author">
+        <div class="quote-avatar" style="background:#10B981">E</div>
+        <div><div class="quote-name">Emeka N.</div><div class="quote-role">Port Harcourt, Nigeria</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-card reveal">
+    <h2>Be first when we launch.</h2>
+    <p>We're onboarding 1,000 Nigerians in our first wave. Join the waitlist now and get early access, zero fees on your first swap, and a founding member badge.</p>
+    <div class="waitlist-form" id="waitlist2">
+      <div id="formWrap2">
+        <div class="input-row">
+          <input type="email" id="emailInput2" placeholder="Your email address" autocomplete="email"/>
+          <button onclick="joinWaitlist2()">Get Early Access →</button>
+        </div>
+        <div class="waitlist-social-proof" style="justify-content:center;">
+          <span style="color:var(--green)">✓</span> Free first swap &nbsp;·&nbsp; <span style="color:var(--green)">✓</span> Founding badge &nbsp;·&nbsp; <span style="color:var(--green)">✓</span> Priority access
+        </div>
+      </div>
+      <div class="success-state" id="successState2">
+        <div class="success-icon">✓</div>
+        <h3>Welcome aboard!</h3>
+        <p>You're in the first wave. Watch your inbox.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">
+    <div class="nav-logo-mark" style="width:28px;height:28px;">
+      <svg viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;">
+        <path d="M12 3 A9 9 0 0 1 21 12" stroke="#4F46E5" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M12 3 A9 9 0 0 0 5 7" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+        <polygon points="13,10 19,13 13,16" fill="#F59E0B"/>
+      </svg>
+    </div>
+    <span class="footer-copy">© 2026 FiatDex. Built in Nigeria 🇳🇬</span>
+  </div>
+  <div class="footer-links">
+    <a href="#">Twitter / X</a>
+    <a href="#">Telegram</a>
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold: 0.1});
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Waitlist form 1
+function joinWaitlist() {
+  const email = document.getElementById('emailInput').value.trim();
+  if(!email || !email.includes('@')) {
+    document.getElementById('emailInput').style.outline = '2px solid #EF4444';
+    setTimeout(() => document.getElementById('emailInput').style.outline = '', 1500);
+    return;
+  }
+  const btn = document.getElementById('joinBtn');
+  btn.textContent = 'Joining...';
+  btn.classList.add('loading');
+  // TODO: POST to your waitlist API (Mailchimp, ConvertKit, Supabase, etc.)
+  // fetch('/api/waitlist', {method:'POST', body: JSON.stringify({email}), headers:{'Content-Type':'application/json'}})
+  setTimeout(() => {
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('successState').classList.add('show');
+    // Update counter
+    document.querySelectorAll('.waitlist-social-proof').forEach(el => {
+      el.innerHTML = el.innerHTML.replace('340+', '341+');
+    });
+  }, 900);
+}
+
+// Waitlist form 2
+function joinWaitlist2() {
+  const email = document.getElementById('emailInput2').value.trim();
+  if(!email || !email.includes('@')) {
+    document.getElementById('emailInput2').style.outline = '2px solid #EF4444';
+    setTimeout(() => document.getElementById('emailInput2').style.outline = '', 1500);
+    return;
+  }
+  const btns = document.querySelectorAll('#waitlist2 button');
+  btns.forEach(b => { b.textContent = 'Joining...'; b.classList.add('loading'); });
+  setTimeout(() => {
+    document.getElementById('formWrap2').style.display = 'none';
+    document.getElementById('successState2').classList.add('show');
+  }, 900);
+}
+
+// Enter key support
+document.getElementById('emailInput').addEventListener('keydown', e => { if(e.key === 'Enter') joinWaitlist(); });
+document.getElementById('emailInput2').addEventListener('keydown', e => { if(e.key === 'Enter') joinWaitlist2(); });
+</script>
+</body>
+</html>
